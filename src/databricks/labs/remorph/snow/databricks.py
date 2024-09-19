@@ -128,7 +128,7 @@ def _datatype_map(self, expression) -> str:
         return "TIMESTAMP"
     if expression.this == exp.DataType.Type.BINARY:
         return "BINARY"
-    if expression.this == exp.DataType.Type.NCHAR:
+    if expression.this in [exp.DataType.Type.NCHAR, exp.DataType.Type.TIME]:
         return "STRING"
     return self.datatype_sql(expression)
 
@@ -203,7 +203,7 @@ def _is_integer(self: org_databricks.Databricks.Generator, expression: local_exp
 
 
 def _parse_json_extract_path_text(
-    self: org_databricks.Databricks.Generator, expression: local_expression.JsonExtractPathText
+        self: org_databricks.Databricks.Generator, expression: local_expression.JsonExtractPathText
 ) -> str:
     this = self.sql(expression, "this")
     path_name = expression.args["path_name"]
@@ -215,7 +215,7 @@ def _parse_json_extract_path_text(
 
 
 def _array_construct_compact(
-    self: org_databricks.Databricks.Generator, expression: local_expression.ArrayConstructCompact
+        self: org_databricks.Databricks.Generator, expression: local_expression.ArrayConstructCompact
 ) -> str:
     exclude = "ARRAY(NULL)"
     array_expr = f"ARRAY({self.expressions(expression, flat=True)})"
@@ -308,8 +308,8 @@ def _parse_date_trunc(self: org_databricks.Databricks.Generator, expression: loc
 
 
 def _get_within_group_params(
-    expr: exp.ArrayAgg | exp.GroupConcat,
-    within_group: exp.WithinGroup,
+        expr: exp.ArrayAgg | exp.GroupConcat,
+        within_group: exp.WithinGroup,
 ) -> local_expression.WithinGroupParams:
     has_distinct = isinstance(expr.this, exp.Distinct)
     agg_col = expr.this.expressions[0] if has_distinct else expr.this
@@ -495,7 +495,7 @@ class Databricks(org_databricks.Databricks):  #
                 "ARRAY_JOIN",
                 arr_agg,
                 expr.args.get("separator") or exp.Literal(this="", is_string=True),
-            )
+                )
 
         def withingroup_sql(self, expression: exp.WithinGroup) -> str:
             agg_expr = expression.this
@@ -707,3 +707,64 @@ class Databricks(org_databricks.Databricks):  #
                     if isinstance(ordered_expression, exp.Ordered) and ordered_expression.args.get('desc') is None:
                         ordered_expression.args['desc'] = False
             return super().order_sql(expression, flat)
+
+        def columnconstraint_sql(self, expression: exp.ColumnConstraint) -> str:
+            this = self.sql(expression, "this")
+            kind_sql = self.sql(expression, "kind").strip()
+            match expression.kind:
+                case exp.CharacterSetColumnConstraint():
+                    return ""
+                case exp.CaseSpecificColumnConstraint():
+                    return ""
+                case exp.CompressColumnConstraint():
+                    return ""
+                case exp.DateFormatColumnConstraint():
+                    return ""
+                case exp.TitleColumnConstraint():
+                    comment = re.split(r"'|'", kind_sql)[1]
+                    return f"COMMENT '{comment}'"
+                case exp.DefaultColumnConstraint():
+                    if kind_sql == "DEFAULT DATE":
+                        return "DEFAULT CURRENT_DATE()"
+                    elif kind_sql == "DEFAULT TIME":
+                        return "DEFAULT (DATE_FORMAT(CURRENT_TIMESTAMP(), 'hh:mm:ss'))"
+                    elif kind_sql == "DEFAULT USER":
+                        return "DEFAULT CURRENT_USER()"
+                    return kind_sql
+                case _:
+                    return f"CONSTRAINT {this} {kind_sql}" if this else kind_sql
+
+        def datatypeparam_sql(self, expression: exp.DataTypeParam) -> str:
+            this = self.sql(expression, "this")
+            specifier = self.sql(expression, "expression")
+            specifier = f" {specifier}" if specifier and self.DATA_TYPE_SPECIFIERS_ALLOWED else ""
+            # {this}{specifier}
+            return ""
+
+        def index_sql(self, expression: exp.Index) -> str:
+            """Databricks doesn't implement index creation"""
+
+            columns = self.sql(expression, "params")
+            columns = f"{columns}" if columns else ""
+
+            # print(expression.args)
+
+            if expression.args.get("primary"):
+                return f"CLUSTER BY {columns}"
+
+        def columndef_sql(self, expression: exp.ColumnDef, sep: str = " ") -> str:
+            constraint = expression.find(exp.GeneratedAsIdentityColumnConstraint)
+            kind = expression.args.get("kind")
+            constraint_def = expression.find(exp.DefaultColumnConstraint)
+            if constraint:
+                expression.set("kind", exp.DataType.build("bigint"))
+            if str(constraint_def) == "DEFAULT TIME":
+                expression.set("kind", exp.DataType.build("string"))
+            return super().columndef_sql(expression, sep)
+
+        def generatedasidentitycolumnconstraint_sql(self, expression: exp.GeneratedAsIdentityColumnConstraint) -> str:
+            if expression and expression.args.get("minvalue"):
+                start = expression.args.get("start")
+                increment = expression.args.get("increment")
+                return f"GENERATED BY DEFAULT AS IDENTITY (START WITH {start} INCREMENT BY {increment})"
+            return self.sql(expression)
