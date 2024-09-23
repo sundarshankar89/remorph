@@ -1,22 +1,23 @@
-from sqlglot.dialects.teradata import Teradata as org_teradata
+from sqlglot.dialects.teradata import Teradata as org_Teradata
 import typing as t
 
 from sqlglot import exp
 from sqlglot.tokens import TokenType
 
 
-class Teradata(org_teradata):
+class Teradata(org_Teradata):
+    teradata = org_Teradata()
 
-    class Parser(org_teradata.Parser):
+    class Parser(org_Teradata.Parser):
 
         STATEMENT_PARSERS = {
-            **org_teradata.Parser.STATEMENT_PARSERS,
+            **org_Teradata.Parser.STATEMENT_PARSERS,
             TokenType.CREATE: lambda self: self._parse_create(),
-            TokenType.WITH: lambda self: self._parse_with(),
+            # TokenType.WITH: lambda self: self._parse_with(),
         }
 
         CONSTRAINT_PARSERS = {
-            **org_teradata.Parser.CONSTRAINT_PARSERS,
+            **org_Teradata.Parser.CONSTRAINT_PARSERS,
             "COMPRESS": lambda self: self._parse_compress(),
         }
 
@@ -155,19 +156,19 @@ class Teradata(org_teradata):
                 clone=clone,
             )
 
-        def _parse_types(
-            self, check_func: bool = False, schema: bool = False, allow_identifiers: bool = True
-        ) -> t.Optional[exp.Expression]:
-            this = super()._parse_types(check_func=check_func, schema=schema, allow_identifiers=allow_identifiers)
-
-            if (
-                isinstance(this, exp.DataType)
-                and this.is_type("numeric", "decimal", "number", "integer", "int", "smallint", "bigint")
-                and not this.expressions
-            ):
-                return exp.DataType.build("DECIMAL(38,0)")
-
-            return this
+        # def _parse_types(
+        #     self, check_func: bool = False, schema: bool = False, allow_identifiers: bool = True
+        # ) -> t.Optional[exp.Expression]:
+        #     this = super()._parse_types(check_func=check_func, schema=schema, allow_identifiers=allow_identifiers)
+        #
+        #     if (
+        #         isinstance(this, exp.DataType)
+        #         and this.is_type("numeric", "decimal", "number", "integer", "int", "smallint", "bigint")
+        #         and not this.expressions
+        #     ):
+        #         return exp.DataType.build("DECIMAL(38,0)")
+        #
+        #     return this
 
         def _parse_compress(self) -> exp.CompressColumnConstraint:
             if self._match(TokenType.L_PAREN, advance=False):

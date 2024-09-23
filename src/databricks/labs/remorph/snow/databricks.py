@@ -68,10 +68,18 @@ def _format_create_sql(self, expression: exp.Create) -> str:
 
     # Remove modifiers in order to simplify the schema.  For example, this removes things like "IF NOT EXISTS"
     # from "CREATE TABLE foo IF NOT EXISTS".
-    args_to_delete = ["temporary", "transient", "external", "replace", "exists", "unique", "materialized", "properties"]
+    # "replace",
+    args_to_delete = ["temporary", "transient", "external", "exists", "unique", "materialized", "properties"]
     for arg_to_delete in args_to_delete:
         if expression.args.get(arg_to_delete):
             del expression.args[arg_to_delete]
+
+    if expression.args['kind'] == "TABLE":
+        expression.args['exists'] = True
+        expression.args['replace'] = False
+    else:
+        if expression.args['replace'] is None:
+            expression.args['exists'] = True
 
     return self.create_sql(expression)
 
@@ -124,8 +132,10 @@ def _lateral_view(self: org_databricks.Databricks.Generator, expression: exp.Lat
 def _datatype_map(self, expression) -> str:
     if expression.this in [exp.DataType.Type.VARCHAR, exp.DataType.Type.NVARCHAR, exp.DataType.Type.CHAR]:
         return "STRING"
-    if expression.this in [exp.DataType.Type.TIMESTAMP, exp.DataType.Type.TIMESTAMPLTZ]:
-        return "TIMESTAMP"
+    if expression.this in [exp.DataType.Type.TIMESTAMP]:
+        return "TIMESTAMP_NTZ"
+    if expression.this in [exp.DataType.Type.TIMESTAMPLTZ]:
+        return "TIMESTAMP_LTZ"
     if expression.this == exp.DataType.Type.BINARY:
         return "BINARY"
     if expression.this in [exp.DataType.Type.NCHAR, exp.DataType.Type.TIME]:
@@ -735,10 +745,6 @@ class Databricks(org_databricks.Databricks):  #
                     return f"CONSTRAINT {this} {kind_sql}" if this else kind_sql
 
         def datatypeparam_sql(self, expression: exp.DataTypeParam) -> str:
-            this = self.sql(expression, "this")
-            specifier = self.sql(expression, "expression")
-            specifier = f" {specifier}" if specifier and self.DATA_TYPE_SPECIFIERS_ALLOWED else ""
-            # {this}{specifier}
             return ""
 
         def index_sql(self, expression: exp.Index) -> str:
