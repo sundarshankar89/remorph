@@ -1,6 +1,7 @@
 import logging
 import os
 from pathlib import Path
+import re
 
 from sqlglot.dialects.dialect import Dialect
 from databricks.labs.remorph.__about__ import __version__
@@ -33,6 +34,12 @@ from databricks.sdk import WorkspaceClient
 logger = logging.getLogger(__name__)
 
 
+def _replace_order_by_values(sql):
+    pattern = r"ORDER BY VALUES \(\s*(\w+)\s*\)"
+    replacement = r"ORDER BY \1"
+    return re.sub(pattern, replacement, sql)
+
+
 def _process_file(
     config: MorphConfig,
     validator: Validator | None,
@@ -51,6 +58,9 @@ def _process_file(
         sql = remove_bom(f.read())
 
     lca_error = lca_utils.check_for_unsupported_lca(get_dialect(config.source.lower()), sql, str(input_file))
+
+    sql = sql.replace("MAP = TD_MAP1", "")
+    sql = _replace_order_by_values(sql)
 
     if lca_error:
         validate_error_list.append(lca_error)
