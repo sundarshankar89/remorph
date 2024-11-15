@@ -140,6 +140,8 @@ def _datatype_map(self, expression) -> str:
         return "BINARY"
     if expression.this in [exp.DataType.Type.NCHAR, exp.DataType.Type.TIME]:
         return "STRING"
+    if expression.this in [exp.DataType.Type.DECIMAL]:
+        return f"DECIMAL({expression.expressions[0].this}, {expression.expressions[1].this})"
     return self.datatype_sql(expression)
 
 

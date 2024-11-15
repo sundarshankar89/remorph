@@ -1,0 +1,410 @@
+{
+    "patterns": [
+      {
+        "pattern": "\\bCOMPRESS\\b.*?,\\s*\\n",
+        "replacement": ",\\n",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "match pattern ending with , and \n"
+      },
+      {
+        "pattern": "\\bCOMPRESS\\b.*?\\)\\s*\\n",
+        "replacement": ")\\n",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "match pattern ending with ) and \n"
+      },
+      {
+        "pattern": "\\bCOMPRESS\\s*\\([^)]*\\)",
+        "replacement": "",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "remove patterns matching multiple lines"
+      },
+      {
+        "pattern": "\\bNULL\\b(?!(\\s*DEFAULT|\\s*TITLE|\\s*GENERATED|\\s*\\))).*?,\\s*\\n",
+        "replacement": "NULL,\\n",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "match pattern ending with , and \n"
+      },
+      {
+        "pattern": "\\bNULL\\b(?!(\\s*DEFAULT|\\s*TITLE|\\s*GENERATED|\\s*\\))).*?\\)\\s*\\n",
+        "replacement": "NULL)\\n",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "match pattern ending with ) and \n"
+      },
+      {
+        "pattern": "\\bCASESPECIFIC\\b(?!(\\s*NOT NULL|\\s*DEFAULT|\\s*TITLE)).*?,\\s*\\n",
+        "replacement": "CASESPECIFIC,\\n",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "match pattern ending with , and \n"
+      },
+      {
+        "pattern": "\\bCASESPECIFIC\\b(?!(\\s*NOT NULL|\\s*DEFAULT|\\s*TITLE)).*?\\)\\s*\\n",
+        "replacement": "CASESPECIFIC)\\n",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "match pattern ending with ) and \n"
+      },
+      {
+        "pattern": "(\\bTITLE\\b\\s*\\'[^\\(]*)\\(\\'[^\\)]*\\)",
+        "replacement": "replace_group_1",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "Mrudula, I've handled it please check---------------UPDATED THIS"
+      },
+      {
+        "pattern": "(\\bTITLE\\b\\s*\\'.*\\')(?!(\\s*NOT NULL|\\s*COMPRESS))",
+        "replacement": "replace_group_1",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "Mrudula, I've handled it please check----------------UPDATED THIS"
+      },
+      {
+        "pattern": "HOUR\\(\\d*\\)\\s*TO\\s*SECOND\\(\\d*\\)",
+        "replacement": "HOUR TO SECOND",
+        "type": "lineByLine",
+        "object_type": "both",
+        "comment": "matches occurrences of the string 'HOUR' followed by optional whitespace, an opening parenthesis, digits, a closing parenthesis, optional whitespace, 'TO', optional whitespace, 'SECOND', an opening parenthesis, digits, and a closing parenthesis."
+      },
+      {
+        "pattern": "HOUR\\(\\d*\\)\\s*TO\\s*MINUTE\\(\\d*\\)|HOUR\\(\\d*\\)\\s*TO\\s*MINUTE",
+        "replacement": "HOUR TO MINUTE",
+        "type": "lineByLine",
+        "object_type": "both",
+        "comment": "1.Occurrences of the string 'HOUR' followed by optional whitespace, an opening parenthesis, digits, a closing parenthesis, optional whitespace, 'TO', optional whitespace, 'MINUTE', an opening parenthesis, digits, and a closing parenthesis. 2.Occurrences of the string 'HOUR' followed by optional whitespace, 'TO', optional whitespace, 'MINUTE'."
+      },
+      {
+        "pattern": "DAY\\(\\d*\\)\\s*TO\\s*MINUTE\\(\\d*\\)|DAY\\(\\d*\\)\\s*TO\\s*MINUTE",
+        "replacement": "DAY TO MINUTE",
+        "type": "lineByLine",
+        "object_type": "both",
+        "comment": "1.Occurrences of the string 'DAY' followed by optional whitespace, an opening parenthesis, digits, a closing parenthesis, optional whitespace, 'TO', optional whitespace, 'MINUTE', an opening parenthesis, digits, and a closing parenthesis. 2.Occurrences of the string 'DAY' followed by optional whitespace, 'TO', optional whitespace, 'MINUTE'."
+      },
+      {
+        "pattern": "INTEGER FORMAT '99:99:99'",
+        "replacement": "STRING",
+        "type": "lineByLine",
+        "object_type": "both",
+        "comment": "replace with STRING"
+      },
+      {
+        "pattern": "SMALLINT FORMAT '99:99'",
+        "replacement": "STRING",
+        "type": "lineByLine",
+        "object_type": "both",
+        "comment": "replace with STRING"
+      },
+      {
+        "pattern": "FLOAT FORMAT '99:99:99'",
+        "replacement": "STRING",
+        "type": "lineByLine",
+        "object_type": "both",
+        "comment": "replace with STRING"
+      },
+      {
+        "pattern": "(DECIMAL\\(\\*)|(NUMBER\\(\\*)",
+        "replacement": "DECIMAL(38",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "replace decimal(*, 2) with decimal(38, 2)"
+      },
+      {
+        "pattern": "(?<!DATE\\s)\\bFORMAT\\s+\\'[^\\']*\\'",
+        "replacement": "",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "FORMAT followed by any pattern will be replaced by empty string"
+      },
+      {
+        "pattern": "\\bSMALLINT\\s*\\([^)]*\\)|\\bSMALLINT\\s*\\d*",
+        "replacement": "SMALLINT ",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "1.Occurrences of the string 'SMALLINT' followed by optional whitespace, an opening parenthesis, any characters except a closing parenthesis, and a closing parenthesis. 2.Occurrences of the string 'SMALLINT' followed by optional whitespace and digits."
+      },
+      {
+        "pattern": "\\bBYTEINT\\s*\\([^)]*\\)|\\bBYTEINT\\s*\\d*",
+        "replacement": "BYTEINT ",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "1.Occurrences of the string 'BYTEINT' followed by optional whitespace, an opening parenthesis, any characters except a closing parenthesis, and a closing parenthesis. 2.Occurrences of the string 'BYTEINT' followed by optional whitespace and digits."
+      },
+      {
+        "pattern": "\\bINTEGER\\s*\\([^)]*\\)|\\bINTEGER\\s*\\d*",
+        "replacement": "INTEGER ",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "1.Occurrences of the string 'INTEGER' followed by optional whitespace, an opening parenthesis, any characters except a closing parenthesis, and a closing parenthesis. 2.Occurrences of the string 'INTEGER' followed by optional whitespace and digits"
+      },
+      {
+        "pattern": "(INTEGER\\s*DEFAULT\\s*\\d*)\\s*\\([^\\)]*\\)",
+        "replacement": "replace_group_1",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "remove patterns that follow DEFAULT value of INTEGER"
+      },
+      {
+        "pattern": "(FLOAT\\s*DEFAULT\\s*\\d+).*[^,\\n\\)]",
+        "replacement": "replace_group_1",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "Mrudula, I've handled it please check"
+      },
+      {
+        "pattern": "\\bVARBYTE[^)]*\\)|\\bBYTE[^)]*\\)",
+        "replacement": "replace_group_2",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "VARBYTE(10) or BYTE(2) (any digit inside bracket) is replaced with BINARY"
+      },
+      {
+        "pattern": "\\b(NUMBER\\(\\d+,\\d+\\))",
+        "replacement": "replace_group_3",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "add NUMBER datatype to title"
+      },
+      {
+        "pattern": "(TIME\\(\\d+\\))\\s*\\(.*?\\)",
+        "replacement": "replace_group_1",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "captures occurrences of the string 'TIME' followed by optional digits within parentheses. The (.*?)\\) captures any characters until the first closing parenthesis is encountered"
+      },
+      {
+        "pattern": "\\s*ORDER BY.*(\\bVALUES\\b|\\bHASH\\b).*[^\\)]\\)",
+        "replacement": "",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "matches occurrences of the string 'ORDER BY' with optional whitespace, followed by any characters (except a closing parenthesis) until a closing parenthesis is encountered"
+      },
+      {
+        "pattern": "(DECIMAL\\(\\d+,\\d+\\))\\s*\\((?:[^)]*?)\\)",
+        "replacement": "replace_group_1",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "removes anything after decimal pattern that's within parantheses"
+      },
+      {
+        "pattern": "(DECIMAL\\(\\d+,\\d+\\))\\s+\\.\\d+",
+        "replacement": "replace_group_1",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "removes .0000 or similar patterns"
+      },
+      {
+        "pattern": "MAP\\s*=\\s*TD_MAP\\d*[^\\(]*",
+        "replacement": "",
+        "type": "entireSQL",
+        "object_type": "both",
+        "comment": "matches occurrences of the string 'MAP = TD_MAP' followed by optional digits and optional whitespace, and may include a comma"
+      },
+      {
+        "pattern": "PARTITION\\s+BY\\s+RANGE_N[^.]*UNKNOWN\\)",
+        "replacement": "",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "Remove partition by constraint"
+      },
+      {
+        "pattern": "PARTITION\\s+BY\\s+RANGE_N[^.]*RANGE\\)",
+        "replacement": "",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "Remove partition by constraint"
+      },
+      {
+        "pattern": "\\s*(WITH|with)\\s*(NO|no)?\\s*(CHECK|check)\\s*(OPTION|option)",
+        "replacement": " ",
+        "type": "entireSQL",
+        "object_type": "both",
+        "comment": "view with check option"
+      },
+      {
+        "pattern": "(\\bLOCKING\\b|\\blocking\\b|\\bLOCK\\b|\\block\\b)\\s*.*\\n?(\\bFOR|\\bfor)?\\s*\\n?\\s*(\\bACCESS|\\baccess)",
+        "replacement": " ",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "view LOCKING ROW FOR - updated by Mrudula. it can include all small case letters as well (as locking row)"
+      },
+      {
+        "pattern": "(\\bLOCKING\\b|\\blocking\\b|\\bLOCK\\b|\\block\\b)\\s*.*\\n?(\\bFOR|\\bfor)",
+        "replacement": " ",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "view LOCKING ROW FOR - updated by Mrudula. it can include all small case letters as well (as locking row)"
+      },
+      {
+        "pattern": "(\\bTINYINT\\b|\\bBINARY\\b|\\bSTRING\\b|\\bCLOB\\b|\\bBLOB\\b)\\(\\d+\\)",
+        "replacement": "replace_group_1",
+        "type": "lineByLine",
+        "object_type": "table",
+        "comment": "remove digits within paranthesis that follows TINYINT, BINARY, STRING)"
+      },
+      {
+        "pattern": "UNIQUE\\s*\\(.*?\\)[^\\n]*\\n",
+        "replacement": " ",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "remove UNIQUE constraint since we've using PRIMARY KEYS"
+      },
+      {
+        "pattern": "ON\\s+COMMIT\\s+(PRESERVE|DELETE)\\s+ROWS",
+        "replacement": " ",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "remove"
+      },
+      {
+        "pattern": "CREATE\\s+(SET|MULTISET)\\s+GLOBAL\\s+TEMPORARY\\b",
+        "replacement": "CREATE SET",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "remove"
+      },
+      {
+        "pattern": "\\bINTERVAL\\s+MINUTE\\s*\\(\\d\\)",
+        "replacement": "INTERVAL MINUTE",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "replace "
+      },
+      {
+        "pattern": "NO BEFORE JOURNAL,",
+        "replacement": "",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "replace "
+      },
+      {
+        "pattern": "NO AFTER JOURNAL,",
+        "replacement": "",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "replace "
+      },
+      {
+        "pattern": "NO FALLBACK ,",
+        "replacement": "",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "replace "
+      },
+      {
+        "pattern": "NO FALLBACK ,",
+        "replacement": "",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "replace "
+      },
+      {
+        "pattern": "CREATE SET TABLE",
+        "replacement": "CREATE TABLE",
+        "type": "entireSQL",
+        "object_type": "both",
+        "comment": "replace "
+      },
+      {
+        "pattern": "CHARACTER SET LATIN NOT CASESPECIFIC",
+        "replacement": "",
+        "type": "entireSQL",
+        "object_type": "both",
+        "comment": "replace "
+      },
+      {
+        "pattern": "CHECKSUM = DEFAULT,",
+        "replacement": "",
+        "type": "entireSQL",
+        "object_type": "table",
+        "comment": "replace "
+      },
+      {
+        "pattern": "ZEROIFNULL\\((\\w+(\\.\\w+)?)\\)",
+        "replacement": "IFNULL(\\1, 0)",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "replace with correct syntax"
+      },
+      {
+        "pattern": "NULLIFZERO\\((\\w+(\\.\\w+)?)\\)",
+        "replacement": "NULLIF(\\1, 0)",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "replace with correct syntax"
+      },
+      {
+        "pattern": "\\bSTRTOK\\s*\\(",
+        "replacement": "SPLIT_PART(",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "replace with correct syntax"
+      },
+      {
+        "pattern": "\\bTD_RIGHT\\s*\\(",
+        "replacement": "RIGHT(",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "replace with correct syntax"
+      },
+      {
+        "pattern": "\\bTD_LEFT\\s*\\(",
+        "replacement": "LEFT(",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "replace with correct syntax"
+      },
+      {
+        "pattern": "\\bTD_QUARTER_OF_YEAR\\s*\\(",
+        "replacement": "QUARTER(",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "replace with correct syntax"
+      },
+      {
+        "pattern": "\\bTD_DAY_OF_WEEK\\s*\\(",
+        "replacement": "DAYOFWEEK(",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "replace with correct syntax"
+      },
+      {
+        "pattern": "\\bOREPLACE\\s*\\(",
+        "replacement": "REPLACE(",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "replace with correct syntax"
+      },
+      {
+        "pattern": "\\bAVE\\s*\\(",
+        "replacement": "AVG(",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "replace with correct syntax"
+      },
+      {
+        "pattern": "\\bAVERAGE\\s*\\(",
+        "replacement": "AVG(",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "replace with correct syntax"
+      },
+      {
+        "pattern": "\\bIS\\s+IN\\b",
+        "replacement": "IN ",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "replace with correct syntax"
+      },
+      {
+        "pattern": "\\bIS\\s+NOT\\s+IN\\b",
+        "replacement": "NOT IN ",
+        "type": "entireSQL",
+        "object_type": "view",
+        "comment": "replace with correct syntax"
+      }
+    ]
+  }
