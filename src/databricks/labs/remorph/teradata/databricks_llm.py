@@ -6,7 +6,7 @@ import dspy
 client = dspy.Databricks(
     model="databricks-meta-llama-3-1-70b-instruct",
     api_key="",
-    api_base="https://e2-demo-field-eng.cloud.databricks.com/serving-endpoints/databricks-meta-llama-3-1-70b-instruct/invocations",
+    api_base="<workspace_url>/serving-endpoints/databricks-meta-llama-3-1-70b-instruct/invocations",
     model_type="text",
     max_tokens=5000,
 )

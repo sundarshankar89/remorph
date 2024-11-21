@@ -22,7 +22,7 @@ class DatabricksDDLTranspile:
 
         # read the config json
         patterns_list, patterns_dict = pre_processing_file.load_and_parse_patterns(
-            "/Users/sriram.mohanty/IdeaProjects/remorphFeatureLatest/src/databricks/labs/remorph/teradata/pre_processing_patterns_config.json"
+            "<path_to_config_json>/pre_processing_patterns_config.json"
         )
         # patterns_dict = OrderedDict()
         try:

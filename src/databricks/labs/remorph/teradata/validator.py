@@ -17,7 +17,7 @@ def validate_query(query):
 
 def api_based_validation(query):
     api_token = ("",)
-    api_url = ("https://e2-demo-west.cloud.databricks.com/api/2.0",)
+    api_url = ("<workspace_url>/api/2.0",)
     # Set the query to validate
     query = "SELECT * FROM my_table WHERE column = 'value'"
 

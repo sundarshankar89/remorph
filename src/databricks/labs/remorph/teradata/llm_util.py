@@ -7,7 +7,7 @@ def convert_using_llm(query):
     client = dspy.Databricks(
         model="databricks-meta-llama-3-1-70b-instruct",
         api_key="",
-        api_base="https://e2-demo-west.cloud.databricks.com/serving-endpoints",
+        api_base="<workspace_url>/serving-endpoints",
         model_type="chat",
         max_tokens=5000,
     )

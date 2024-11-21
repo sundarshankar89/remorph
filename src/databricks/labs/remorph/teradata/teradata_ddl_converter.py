@@ -9,7 +9,7 @@ from databricks.labs.remorph.teradata.MainTest import run_remorph_teradata
 
 def run_preprocessor(raw_sql):
     patterns_list, patterns_dict = pre_processing_file.load_and_parse_patterns(
-        "/Users/sriram.mohanty/IdeaProjects/remorphTeradata/src/databricks/labs/remorph/teradata/pre_processing_patterns_config.json"
+        "<path_config_json>/pre_processing_patterns_config.json"
     )
     preprocessed_sql = pre_processing_file.execute(raw_sql, patterns_list, patterns_dict)
     return preprocessed_sql
@@ -39,14 +39,14 @@ def run_llm(final_ddl):
 
 def write_to_file(content):
     output_file_path = (
-        f"/Users/sriram.mohanty/IdeaProjects/remorphTeradata/tests/resources/TeradataConvertedDDL{file_name}"
+        f"<output_folder>/TeradataConvertedDDL{file_name}"
     )
     with open(output_file_path, 'w') as file:
         file.write(content)
 
 
-file_name = "/DB_ODS/COUP_LHSALES.ddl"
-raw_sql = read_ddl_file(f"/Users/sriram.mohanty/IdeaProjects/remorphTeradata/tests/resources/TeradataDDLs{file_name}")
+file_name = "/test.ddl"
+raw_sql = read_ddl_file(f"<input_folder>/TeradataDDLs{file_name}")
 
 processed_sql = run_preprocessor(raw_sql)
 print(processed_sql)
